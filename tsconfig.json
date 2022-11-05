@@ -1,17 +1,11 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["es5", "dom"],
     "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
     "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noImplicitAny": false,
-    "removeComments": false,
     "sourceMap": true,
-    "target": "es5"
+    "outDir": "dist"
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules/*"]
+  "lib": ["es2015"]
 }
