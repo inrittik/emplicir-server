@@ -1,1 +1,3 @@
-# SMS-server
+# Emplicir-server
+
+## An employee management system tool
