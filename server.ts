@@ -1,18 +1,40 @@
-import express from "express";
-import cors from "cors"
+const {httpServer} = require("./app")
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
 
-const app = express();
-const port = 5000;
-
-app.get("/", (req: express.Request, res: express.Response) => {
-    res.send("Hello World")
+dotenv.config({path:path.join(__dirname, `./.env`)})
+let server:any;
+mongoose.connect(process.env.MONGODB_URI).then(() => {
+  console.log(`⚡️[DB]: Connected`);
+  server = httpServer.listen(process.env.PORT, () => {
+    console.log(`⚡️[Server]: Listening on port ${process.env.PORT}`);
+  })
 });
 
-app.listen(port, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
-});
+const exitHandler = () => {
+  if (server) {
+    server.close(() => {
+      console.log("Server closed");
+      process.exit(1);
+    })
+  }
+  else {
+    process.exit(1);
+  }
+}
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-const ALLOWED_ORIGINS = ["http://localhost:3000"];
-app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
+const unexpectedErrorHandler = (error:any) => {
+  console.log(error);
+  exitHandler();
+};
+
+process.on("uncaughtException", unexpectedErrorHandler);
+process.on("unhandledRejection", unexpectedErrorHandler);
+
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received");
+  if (server) {
+    server.close();
+  }
+});
