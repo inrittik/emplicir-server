@@ -1,5 +1,8 @@
 import { Schema, Types, model } from "mongoose";
 import validator from "validator";
+const { toJson, paginate } = require("./plugins");
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 interface UserIf {
   username?: string;
@@ -46,6 +49,8 @@ interface UserIf {
   subordinates?: Types.ObjectId[];
   superordinates?: Types.ObjectId[];
   personalInfoCompleted: boolean;
+  branch: Types.ObjectId;
+  department: Types.ObjectId;
 }
 
 const UserSchema = new Schema<UserIf>({
@@ -179,7 +184,70 @@ const UserSchema = new Schema<UserIf>({
     type: Boolean,
     default: false,
   },
+  branch: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
+  department: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
 });
+
+
+// add plugin that converts mongoose to json
+UserSchema.plugin(toJson)
+UserSchema.plugin(paginate)
+
+/**
+ * Check if email is taken
+ * @param {string} email - The user's email
+ * @param {ObjectId} [excludeUserId] - The id of the user to be excluded
+ * @returns {Promise<boolean>}
+ */
+UserSchema.statics.isEmailTaken = async function (email, excludeUserId) {
+  const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
+  return !!user;
+};
+
+
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  try {
+    const salt = await bcrypt.genSalt(process.env.SALT_WORK_FACTOR);
+    this.password = await bcrypt.hash(this.password, salt);
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
+UserSchema.methods.generateToken = function (expiry = "7d") {
+  const payload = {
+    id: this._id,
+    username: this.username,
+    role: this.role || "user",
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: expiry,
+  });
+};
+
+UserSchema.methods.validatePassword = async function validatePassword(data) {
+  return await bcrypt.compare(data, this.password);
+};
+
+UserSchema.statics.findByEmail = function (email, callback) {
+  if (!email) {
+    return callback(new Error("errors.missingEmail"), null);
+  } else {
+    this.findOne({ email: email }, function (err, user) {
+      return callback(err, user);
+    });
+  }
+};
+
 
 const User = model<UserIf>("User", UserSchema);
 module.exports = User;

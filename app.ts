@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
+const authRouter = require("./routers/authRouter")
 
 const app = express();
 app.use(express.json());
@@ -27,8 +28,6 @@ app.use((req, res, next) => {
 
 app.options("*", cors());
 
-app.get('/', (req,res) => {
-    res.send("Server Running")
-})
+app.use("/auth/", authRouter);
 
 module.exports = { httpServer };

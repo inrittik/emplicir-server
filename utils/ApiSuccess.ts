@@ -6,4 +6,4 @@ const ApiSuccess = (success: any, object = {}, message: any) => {
   };
 };
 
-module.exports = ApiSuccess;
+module.exports = ApiSuccess
