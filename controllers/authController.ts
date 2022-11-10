@@ -1,8 +1,16 @@
 const User = require("../models/userModel");
-import ApiError from "../utils/ApiError"
-const {ApiSuccess} = require("../utils/ApiSuccess")
+import httpStatus from "http-status";
+import ApiError from "../utils/ApiError";
+const { ApiSuccess } = require("../utils/ApiSuccess");
+const catchAsync = require("../utils/catchAsync");
+const { authService, userService } = require("../services");
 
-exports.registerUser = () => {};
+exports.registerUser = catchAsync(async (req: any, res: any) => {
+  const user = await userService.createUser(req.body);
+  res
+    .status(httpStatus.CREATED)
+    .send(ApiSuccess(true, { user }, "User registered successfully"));
+});
 
 exports.loginUser = () => {};
 
