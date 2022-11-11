@@ -3,13 +3,23 @@ import httpStatus from "http-status";
 import ApiError from "../utils/ApiError";
 const { ApiSuccess } = require("../utils/ApiSuccess");
 const catchAsync = require("../utils/catchAsync");
-const { authService, userService } = require("../services");
+const { authService, userService, emailService, tokenService } = require("../services");
 
 exports.registerUser = catchAsync(async (req: any, res: any) => {
   const user = await userService.createUser(req.body);
+  const emailVerifictionToken = await tokenService.generateEmailVerifyToken(
+    req.body.email
+  );
+  await emailService.sendVerifyEmail(req.body.email, emailVerifictionToken);
   res
     .status(httpStatus.CREATED)
-    .send(ApiSuccess(true, { user }, "User registered successfully"));
+    .send(
+      ApiSuccess(
+        true,
+        { user },
+        `User registered successfully and Verification email has been sent to ${req.body.email}`
+      )
+    );
 });
 
 exports.loginUser = () => {};
