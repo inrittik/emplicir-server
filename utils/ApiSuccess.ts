@@ -1,4 +1,4 @@
-const ApiSuccess = (success: any, object = {}, message: any) => {
+const ApiSuccess = (success: boolean, object = {}, message: string) => {
   return {
     success,
     data: object,
@@ -6,4 +6,4 @@ const ApiSuccess = (success: any, object = {}, message: any) => {
   };
 };
 
-module.exports = ApiSuccess
+module.exports = {ApiSuccess}

@@ -6,7 +6,7 @@
  *  - replaces _id with id
  */
 
-const deleteAtPath = (obj:any, path:any, index:number) => {
+const deleteAtPath = (obj:any, path:any, index:any) => {
   if (index === path.length - 1) {
     delete obj[path[index]];
     return;
@@ -14,14 +14,14 @@ const deleteAtPath = (obj:any, path:any, index:number) => {
   deleteAtPath(obj[path[index]], path, index + 1);
 };
 
-export const toJSON = (schema:any) => {
-  let transform:any;
+export default function (schema:any) {
+  let transform;
   if (schema.options.toJSON && schema.options.toJSON.transform) {
     transform = schema.options.toJSON.transform;
   }
 
   schema.options.toJSON = Object.assign(schema.options.toJSON || {}, {
-    transform(doc:any, ret:any, options:any) {
+    transform(doc, ret, options) {
       Object.keys(schema.paths).forEach((path) => {
         if (schema.paths[path].options && schema.paths[path].options.private) {
           deleteAtPath(ret, path.split("."), 0);
@@ -40,3 +40,4 @@ export const toJSON = (schema:any) => {
   });
 };
 
+// module.exports = {toJSON};

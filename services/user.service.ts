@@ -1,13 +1,14 @@
 import httpStatus from "http-status";
 const User = require('../models/userModel')
 import ApiError from '../utils/ApiError'
+import {Types} from "mongoose"
 
 /**
  * Get user by id
  * @param {ObjectId} id
  * @returns {Promise<User>}
  */
-const getUserById = async (id:any) => {
+const getUserById = async (id: Types.ObjectId): Promise<typeof User> => {
   const user = await User.findById(id);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found against this id");
@@ -16,11 +17,20 @@ const getUserById = async (id:any) => {
 };
 
 /**
+ * Get user by email
+ * @param {string} email
+ * @returns {Promise<User>}
+ */
+const getUserByEmail = async (email:string) => {
+  return User.findOne({ email });
+};
+
+/**
  * Create a user
  * @param {Object} userBody
  * @returns {Promise<User>}
  */
-const createUser = async (userBody:any) => {
+const createUser = async (userBody: any) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
@@ -33,7 +43,7 @@ const createUser = async (userBody:any) => {
  * @param {Object} updateBody
  * @returns {Promise<User>}
  */
-const updateUserById = async (userId:any, updateBody:any) => {
+const updateUserById = async (userId:Types.ObjectId, updateBody:any): Promise<typeof User> => {
   const user = await getUserById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
@@ -51,4 +61,5 @@ module.exports = {
   getUserById,
   createUser,
   updateUserById,
+  getUserByEmail,
 };

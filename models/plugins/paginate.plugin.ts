@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-const paginate = (schema:any) => {
+export default function (schema:any) {
   /**
    * @typedef {Object} QueryResult
    * @property {Document[]} results - Results found
@@ -19,11 +19,11 @@ const paginate = (schema:any) => {
    * @param {number} [options.page] - Current page (default = 1)
    * @returns {Promise<QueryResult>}
    */
-  schema.statics.paginate = async function (filter:any, options:any, perDocumentLimit:any) {
+  schema.statics.paginate = async function (filter, options, perDocumentLimit) {
     let sort = "";
     if (options.sortBy) {
       const sortingCriteria = [];
-      options.sortBy.split(",").forEach((sortOption:any) => {
+      options.sortBy.split(",").forEach((sortOption) => {
         const [key, order] = sortOption.split(":");
         sortingCriteria.push((order === "desc" ? "-" : "") + key);
       });
@@ -82,4 +82,4 @@ const paginate = (schema:any) => {
   };
 };
 
-module.exports = paginate;
+// module.exports = {paginate};

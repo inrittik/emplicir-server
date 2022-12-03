@@ -1,57 +1,10 @@
 import { Schema, Types, model } from "mongoose";
 import validator from "validator";
-const { toJson, paginate } = require("./plugins");
+import toJSON from "./plugins/toJSON.plugin"
+import paginate from "./plugins/paginate.plugin";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
-
-interface UserIf {
-  username?: string;
-  email: string;
-  password: string;
-  isEmailVerified: boolean;
-  avatar?: {
-    public_id: string;
-    url: string;
-  };
-  gender: string;
-  dateOfBirth?: Date;
-  role: string;
-  mobile: {
-    countryCode: string;
-    phoneNumber: string;
-  };
-  isMobileVerified: boolean;
-  auth: {
-    otp: {
-      code: number;
-      createdAt: Date;
-    };
-    passwordResetKey: string;
-    passwordResetDate: Date;
-    passwordResetUsed: boolean;
-    loginAttempts: number;
-    accountDeactivated: boolean;
-    lockUntil: number;
-  };
-  address: {
-    country: string;
-    state: string;
-    city: string;
-    line1: string;
-    line2: string;
-    pinCode: string;
-  };
-  teams?: Types.ObjectId[];
-  workspaces?: Types.ObjectId[];
-  isStillEmployeed: boolean;
-  employeedSince?: Date;
-  employeedTill?: Date;
-  subordinates?: Types.ObjectId[];
-  superordinates?: Types.ObjectId[];
-  personalInfoCompleted: boolean;
-  branch: Types.ObjectId;
-  department: Types.ObjectId;
-}
+import {UserIf} from "../interfaces/User"
 
 const UserSchema = new Schema<UserIf>({
   username: {
@@ -92,11 +45,9 @@ const UserSchema = new Schema<UserIf>({
   mobile: {
     countryCode: {
       type: String,
-      required: true,
     },
     phoneNumber: {
       type: String,
-      required: true,
     },
   },
   isMobileVerified: {
@@ -108,11 +59,9 @@ const UserSchema = new Schema<UserIf>({
       type: {
         code: {
           type: Number,
-          required: true,
         },
         createdAt: {
           type: Date,
-          required: true,
           default: Date.now,
         },
       },
@@ -120,50 +69,42 @@ const UserSchema = new Schema<UserIf>({
     passwordResetKey: { type: String },
     passwordResetDate: { type: Date },
     passwordResetUsed: { type: Boolean },
-    loginAttempts: { type: Number, required: true, default: 0 },
+    loginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Number },
     accountDeactivated: { type: Boolean, default: false },
   },
   address: {
     country: {
       type: String,
-      required: true,
     },
     province: {
       type: String,
-      required: true,
     },
     city: {
       type: String,
-      required: true,
     },
     line1: {
       type: String,
-      required: true,
     },
     line2: {
       type: String,
     },
     pinCode: {
       type: String,
-      required: true,
     },
   },
   teams: [
     {
       type: Schema.Types.ObjectId,
-      required: true,
     },
   ],
   workspaces: [
     {
       type: Schema.Types.ObjectId,
-      required: true,
     },
   ],
   isStillEmployeed: {
     type: Boolean,
-    required: true,
     default: false,
   },
   employeedSince: Date,
@@ -171,13 +112,11 @@ const UserSchema = new Schema<UserIf>({
   subordinates: [
     {
       type: Schema.Types.ObjectId,
-      required: true,
     },
   ],
   superordinates: [
     {
       type: Schema.Types.ObjectId,
-      required: true,
     },
   ],
   personalInfoCompleted: {
@@ -186,17 +125,15 @@ const UserSchema = new Schema<UserIf>({
   },
   branch: {
     type: Schema.Types.ObjectId,
-    required: true,
   },
   department: {
     type: Schema.Types.ObjectId,
-    required: true,
   },
 });
 
 
 // add plugin that converts mongoose to json
-UserSchema.plugin(toJson)
+UserSchema.plugin(toJSON)
 UserSchema.plugin(paginate)
 
 /**

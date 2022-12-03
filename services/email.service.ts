@@ -2,6 +2,7 @@ import ApiError from "../utils/ApiError"
 import httpStatus from "http-status"
 const { send_mail } = require("../middlewares/mail")
 const config = require("../config/config");
+const User = require("../models/userModel");
 
 /**
  * Send Reset Password Email
@@ -10,10 +11,9 @@ const config = require("../config/config");
  * @returns {string}
  */
 
-const sendResetPasswordEmail = (email:any, token:any) => {
+const sendResetPasswordEmail = (email:string, token:string) => {
   try {
     send_mail({
-      title: "Reset Password Link",
       mail: config.email.fromMail,
       reciever: email,
       subject: "Reset Password Link",
@@ -37,10 +37,9 @@ const sendResetPasswordEmail = (email:any, token:any) => {
  * @returns {string}
  */
 
- const sendVerifyEmail = (email, token) => {
+ const sendVerifyEmail = (email:string, token:string) => {
   try {
     send_mail({
-      title: "Email Verification Link",
       mail: config.email.fromMail,
       reciever: email,
       subject: "Verify Link",
@@ -69,17 +68,16 @@ const sendEmailOtp = async (user) => {
   {
     const otpCode = Math.floor( 1000 + Math.random() * 9000 );
     await send_mail({
-      title: "Emplicir OTP Email",
       mail: config.email.fromMail,
       reciever: user.email,
-      subject: "OTP",
+      subject: "OTP for Verification",
       text: `
         <h2>OTP Verification</h2>
         <a>Here is you OTP ${otpCode}</a>
         `,
     });
     user.auth.otp = {code: otpCode};
-    await user. save()
+    await user.save()
     return user;
   } catch (err) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Server couldn't process the reset, please try again.");

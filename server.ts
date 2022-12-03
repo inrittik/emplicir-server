@@ -24,8 +24,11 @@ const exitHandler = () => {
   }
 }
 
-const unexpectedErrorHandler = (error:any) => {
-  console.log(error);
+const unexpectedErrorHandler = (error:unknown) => {
+  let message:string;
+  if (error instanceof Error) message = error.message;
+  else message = String(error);
+  console.log(message);
   exitHandler();
 };
 

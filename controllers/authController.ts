@@ -5,7 +5,7 @@ const { ApiSuccess } = require("../utils/ApiSuccess");
 const catchAsync = require("../utils/catchAsync");
 const { authService, userService, emailService, tokenService } = require("../services");
 
-exports.registerUser = catchAsync(async (req: any, res: any) => {
+exports.registerUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const emailVerifictionToken = await tokenService.generateEmailVerifyToken(
     req.body.email
