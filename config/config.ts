@@ -31,4 +31,7 @@ module.exports = {
     refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS,
     resetExpirationMinutes: process.env.JWT_RESET_EXPIRATION_MINUTES,
   },
+  cookie: {
+    cookieExpire: process.env.COOKIE_EXPIRE,
+  }
 };

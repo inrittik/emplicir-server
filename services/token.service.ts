@@ -37,6 +37,7 @@ const generateToken = (
   return jwt.sign(payload, secret);
 };
 
+
 /**
  * Save a token
  * @param {string} token
@@ -63,6 +64,7 @@ const saveToken = async (
   return tokenDoc;
 };
 
+
 /**
  * Generate Email verification
  * @param {string} email
@@ -85,6 +87,34 @@ const generateEmailVerifyToken = async (email: string) => {
   return emailVerifyToken;
 };
 
+
+/**
+ * Generate auth tokens
+ * @param {User} user
+ * @returns {Promise<Object>}
+ */
+const generateAuthTokens = async (user:any) => {
+  const accessTokenExpires = dayjs().add(config.jwt.accessExpirationMinutes, "minutes");
+  const accessToken = generateToken(user.id, accessTokenExpires, user.username, user.role, tokenTypes.ACCESS);
+
+  const refreshTokenExpires = dayjs().add(config.jwt.refreshExpirationDays, "days");
+  const refreshToken = generateToken(user.id, refreshTokenExpires, user.username,user.role, tokenTypes.REFRESH);
+  await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
+
+  return {
+    access: {
+      token: accessToken,
+      expires: accessTokenExpires.toDate(),
+    },
+    refresh: {
+      token: refreshToken,
+      expires: refreshTokenExpires.toDate(),
+    },
+  };
+};
+
+
 module.exports = {
-  generateEmailVerifyToken  
-}
+  generateEmailVerifyToken,
+  generateAuthTokens,
+};
