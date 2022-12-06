@@ -20,7 +20,7 @@ const sendResetPasswordEmail = (email:string, token:string) => {
       text: `
         <h2>Please follow the given link below to reset your password</h2>
         <a href=${config.client_url}/reset_password?token=${token} >Click this link to reset your password</a>
-        <p>The link will expire after 30 minutes.</p>
+        <p>The link will expire after ${config.jwt.accessExpirationMinutes} minutes.</p>
         `,
     });
     const successMessage = `Email has been sent to ${email}. Kindly follow the link to reset your password`;
@@ -37,18 +37,18 @@ const sendResetPasswordEmail = (email:string, token:string) => {
  * @returns {string}
  */
 
- const sendVerifyEmail = (email:string, token:string) => {
-  try {
-    send_mail({
-      mail: config.email.fromMail,
-      reciever: email,
-      subject: "Verify Link",
-      text: `
-        <h2>Please follow the given link below to Verify your email</h2>
-        <a href=${config.client_url}/verify_email?token=${token} >Click this link to Verify your email</a>
+ const sendVerifyEmail = async (email:string, token:string) => {
+   try {
+     const body = {
+       receiver: email,
+       subject: "Verify Email",
+       text: `
+        <h2>Please follow the given link below to reset your password</h2>
+        <a href=${config.client_url}/reset_password?token=${token} >Click this link to reset your password</a>
         <p>The link will expire after 30 minutes.</p>
         `,
-    });
+     };
+    await send_mail(body);
     const successMessage = `Email has been sent to ${email}. Kindly open the link to Verify your email`;
     return successMessage;
   } catch (err) {
