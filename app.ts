@@ -2,10 +2,14 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 const authRouter = require("./routers/authRouter")
+const cookieParser = require("cookie-parser");
+const cookieEncrypter = require("cookie-encrypter");
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.JWT_SECRET));
+app.use(cookieEncrypter(process.env.JWT_SECRET));
 
 const ALLOWED_ORIGINS = ["http://localhost:3000"];
 app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));

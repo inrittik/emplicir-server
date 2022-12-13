@@ -75,7 +75,7 @@ const generateEmailVerifyToken = async (email: string) => {
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
   }
-  const expires = dayjs().add(config.jwt.resetExpirationMinutes, "minutes");
+  const expires = dayjs().add(config.jwt.accessExpirationMinutes, "minutes");
   const emailVerifyToken = generateToken(
     user.id,
     expires,
@@ -98,7 +98,9 @@ const generateAuthTokens = async (user:any) => {
   const accessToken = generateToken(user.id, accessTokenExpires, user.username, user.role, tokenTypes.ACCESS);
 
   const refreshTokenExpires = dayjs().add(config.jwt.refreshExpirationDays, "days");
-  const refreshToken = generateToken(user.id, refreshTokenExpires, user.username,user.role, tokenTypes.REFRESH);
+  const refreshToken = generateToken(user.id, refreshTokenExpires, user.username, user.role, tokenTypes.REFRESH);
+
+  // await saveToken(accessToken, user.id, accessTokenExpires, tokenTypes.ACCESS);
   await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
@@ -114,7 +116,31 @@ const generateAuthTokens = async (user:any) => {
 };
 
 
+/**
+ * Verify token and return token doc (or throw an error if it is not valid)
+ * @param {string} token
+ * @param {string} type
+ * @returns {Promise<Token>}
+ */
+const verifyToken = async (token: string, type: string) => {
+  const payload = jwt.verify(token, config.jwt.secret);
+  const tokenDoc = await Token.findOne({
+    token,
+    type,
+    user: payload.id,
+    blacklisted: false,
+  });
+  if (!tokenDoc) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "Token not found or has been blacklisted"
+    );
+  }
+  return tokenDoc;
+};
+
 module.exports = {
   generateEmailVerifyToken,
   generateAuthTokens,
+  verifyToken
 };

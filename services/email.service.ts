@@ -43,9 +43,9 @@ const sendResetPasswordEmail = (email:string, token:string) => {
        receiver: email,
        subject: "Verify Email",
        text: `
-        <h2>Please follow the given link below to reset your password</h2>
-        <a href=${config.client_url}/reset_password?token=${token} >Click this link to reset your password</a>
-        <p>The link will expire after 30 minutes.</p>
+        <h2>Please follow the given link below to confirm your email</h2>
+        <a href=${config.client_url}/auth/verify_email/${token} >Click Here</a>
+        <p>The link will expire after ${config.jwt.accessExpirationMinutes} minutes.</p>
         `,
      };
     await send_mail(body);

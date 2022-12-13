@@ -1,4 +1,4 @@
-const ApiSuccess = require("../utils/ApiSuccess");
+const {ApiSuccess} = require("../utils/ApiSuccess");
 const config = require("../config/config")
 import {Response} from "express"
 

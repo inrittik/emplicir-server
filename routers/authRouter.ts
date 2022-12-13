@@ -12,7 +12,7 @@ router.post("/login", authController.loginUser)
 // router.put("/password.update", authController.updatePassword)
 // router.put("/user/update", authController.updateUserById)
 // router.get("/email-otp", authController.sendEmailOtp)
-router.post("/verify/email", authController.verifyEmail)
+router.get("/verify_email/:token", authController.verifyEmail)
 // router.post("sms-otp", authController.sendSmsOtp)
 // router.post("/verify/sms-otp", authController.verifySmsOtp)
 

@@ -4,7 +4,8 @@ import ApiError from "../utils/ApiError";
 const { ApiSuccess } = require("../utils/ApiSuccess");
 const catchAsync = require("../utils/catchAsync");
 const { authService, userService, emailService, tokenService } = require("../services");
-const {sendCookie} = require("../utils/cookie")
+const { sendCookie } = require("../utils/cookie")
+const config = require("../config/config");
 
 exports.registerUser = catchAsync(async (req:Request, res:Response) => {
   const user = await userService.createUser(req.body);
@@ -55,14 +56,14 @@ exports.resetPassword = catchAsync(async (req:Request, res:Response) => {});
 exports.sendEmailOtp = catchAsync(async (req:Request, res:Response) => {});
 
 exports.verifyEmail = catchAsync(async (req: Request, res: Response) => {
-  const user = await authService.verifyEmail(req.body.token);
+  const user = await authService.verifyEmail(req.params.token);
   res
     .status(httpStatus.OK)
     .send(
       ApiSuccess(
         true,
         { user },
-        "User verified successfully, You can login Now"
+        "User verified successfully, You can close this wiindow and login now."
       )
     );
 });
