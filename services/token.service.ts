@@ -7,7 +7,8 @@ import ApiError from "../utils/ApiError";
 import httpStatus from "http-status";
 import dayjs from "dayjs";
 import { Types } from "mongoose";
- 
+
+
 /**
  * Generate token
  * @param {ObjectId} userId
@@ -93,15 +94,39 @@ const generateEmailVerifyToken = async (email: string) => {
  * @param {User} user
  * @returns {Promise<Object>}
  */
-const generateAuthTokens = async (user:any) => {
-  const accessTokenExpires = dayjs().add(config.jwt.accessExpirationMinutes, "minutes");
-  const accessToken = generateToken(user.id, accessTokenExpires, user.username, user.role, tokenTypes.ACCESS);
+const generateAuthTokens = async (user: any) => {
+  const accessTokenExpires = dayjs().add(
+    config.jwt.accessExpirationMinutes,
+    "minutes"
+  );
+  const accessToken = generateToken(
+    user.id,
+    accessTokenExpires,
+    user.username,
+    user.role,
+    tokenTypes.ACCESS
+  );
 
-  const refreshTokenExpires = dayjs().add(config.jwt.refreshExpirationDays, "days");
-  const refreshToken = generateToken(user.id, refreshTokenExpires, user.username, user.role, tokenTypes.REFRESH);
+  const refreshTokenExpires = dayjs().add(
+    config.jwt.refreshExpirationDays,
+    "days"
+  );
+  const refreshToken = generateToken(
+    user.id,
+    refreshTokenExpires,
+    user.username,
+    user.role,
+    tokenTypes.REFRESH
+  );
+
 
   // await saveToken(accessToken, user.id, accessTokenExpires, tokenTypes.ACCESS);
-  await saveToken(refreshToken, user.id, refreshTokenExpires, tokenTypes.REFRESH);
+  await saveToken(
+    refreshToken,
+    user.id,
+    refreshTokenExpires,
+    tokenTypes.REFRESH
+  );
 
   return {
     access: {
@@ -139,8 +164,38 @@ const verifyToken = async (token: string, type: string) => {
   return tokenDoc;
 };
 
+
+/**
+ * Generate reset password token
+ * @param {string} email
+ * @returns {Promise<string>}
+ */
+const generateResetPasswordToken = async (email) => {
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
+  }
+  const expires = dayjs().add(config.jwt.resetExpirationMinutes, "minutes");
+  const resetPasswordToken = generateToken(
+    user.id,
+    expires,
+    user.username,
+    user.role,
+    tokenTypes.RESET_PASSWORD
+  );
+  await saveToken(
+    resetPasswordToken,
+    user.id,
+    expires,
+    tokenTypes.RESET_PASSWORD
+  );
+  return resetPasswordToken;
+};
+
+
 module.exports = {
   generateEmailVerifyToken,
   generateAuthTokens,
-  verifyToken
+  generateResetPasswordToken,
+  verifyToken,
 };

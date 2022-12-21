@@ -1,11 +1,15 @@
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
+import helmet from "helmet";
 import { createServer } from "http";
 const authRouter = require("./routers/authRouter")
 const cookieParser = require("cookie-parser");
 const cookieEncrypter = require("cookie-encrypter");
 
 const app = express();
+app.use(morgan("short"));
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(process.env.JWT_SECRET));

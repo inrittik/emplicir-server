@@ -43,7 +43,7 @@ const createUser = async (userBody: any) => {
  * @param {Object} updateBody
  * @returns {Promise<User>}
  */
-const updateUserById = async (userId:Types.ObjectId, updateBody:any): Promise<typeof User> => {
+const updateUserById = async (userId:Types.ObjectId, updateBody:any) => {
   const user = await getUserById(userId);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");

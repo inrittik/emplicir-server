@@ -19,7 +19,7 @@ const sendResetPasswordEmail = (email:string, token:string) => {
       subject: "Reset Password Link",
       text: `
         <h2>Please follow the given link below to reset your password</h2>
-        <a href=${config.client_url}/reset_password?token=${token} >Click this link to reset your password</a>
+        <a href=${config.client_url}/auth/password/reset/${token} >Click this link to reset your password</a>
         <p>The link will expire after ${config.jwt.accessExpirationMinutes} minutes.</p>
         `,
     });
