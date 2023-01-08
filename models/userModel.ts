@@ -13,7 +13,7 @@ const UserSchema = new Schema<UserIf>({
   },
   email: {
     type: String,
-    require: [true, "Enter an email address."],
+    required: [true, "Enter an email address."],
     validate: [validator.isEmail, "Enter a valid email address"],
   },
   password: {

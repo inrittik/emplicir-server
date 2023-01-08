@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import ApiError from "../utils/ApiError";
+import ErrorResponse from "../utils/ErrorResponse";
 const { ApiSuccess } = require("../utils/ApiSuccess");
 const catchAsync = require("../utils/catchAsync");
 const { authService, userService, emailService, tokenService } = require("../services");
@@ -17,9 +18,15 @@ const User = require("../models/userModel");
  */
 exports.registerUser = catchAsync(async (req:Request, res:Response) => {
   const user = await userService.createUser(req.body);
+  if (user instanceof ApiError) {
+    return ErrorResponse(user,res)
+  }
   const emailVerifictionToken = await tokenService.generateEmailVerifyToken(
     req.body.email
   );
+  if (emailVerifictionToken instanceof ApiError) { 
+    return ErrorResponse(emailVerifictionToken,res);
+  }
   await emailService.sendVerifyEmail(req.body.email, emailVerifictionToken);
   res
     .status(httpStatus.CREATED)
@@ -42,17 +49,21 @@ exports.loginUser = catchAsync(async (req:Request, res:Response) => {
   const { email, password } = req.body;
 
   const user = await authService.loginUserWithEmailAndPassword(email, password);
+  if (user instanceof ApiError) { 
+    return ErrorResponse(user,res);
+  }
   const tokens = await tokenService.generateAuthTokens(user);
+  if (tokens instanceof ApiError) { 
+    return ErrorResponse(tokens,res);
+  }
 
   if (!user.isEmailVerified) {
     const emailVerifictionToken = await tokenService.generateEmailVerifyToken(
       req.body.email
     );
+    if(emailVerifictionToken instanceof ApiError) return ErrorResponse(emailVerifictionToken,res);
     await emailService.sendVerifyEmail(req.body.email, emailVerifictionToken);
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Please Verify your Email first. Check your Email inbox to verify your email"
-    );
+    return res.status(httpStatus.BAD_REQUEST).send({error: "Please Verify your Email first. Check your Email inbox to verify your email"})
   }
   sendCookie({ user, tokens }, httpStatus.ACCEPTED, res, "Logged in successfully");
 });

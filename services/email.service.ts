@@ -26,7 +26,7 @@ const sendResetPasswordEmail = (email:string, token:string) => {
     const successMessage = `Email has been sent to ${email}. Kindly follow the link to reset your password`;
     return successMessage;
   } catch (err) {
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Server couldn't process the reset, please try again.");
+    return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Server couldn't process the reset, please try again.");
   }
 };
 
@@ -52,7 +52,7 @@ const sendResetPasswordEmail = (email:string, token:string) => {
     const successMessage = `Email has been sent to ${email}. Kindly open the link to Verify your email`;
     return successMessage;
   } catch (err) {
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Server couldn't process the email Verification, please try again.");
+    return new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Server couldn't process the email Verification, please try again.");
   }
 };
 

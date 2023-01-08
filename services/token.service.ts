@@ -74,7 +74,7 @@ const saveToken = async (
 const generateEmailVerifyToken = async (email: string) => {
   const user = await userService.getUserByEmail(email);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
+    return new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
   }
   const expires = dayjs().add(config.jwt.accessExpirationMinutes, "minutes");
   const emailVerifyToken = generateToken(
@@ -156,7 +156,7 @@ const verifyToken = async (token: string, type: string) => {
     blacklisted: false,
   });
   if (!tokenDoc) {
-    throw new ApiError(
+    return new ApiError(
       httpStatus.NOT_FOUND,
       "Token not found or has been blacklisted"
     );
@@ -173,7 +173,7 @@ const verifyToken = async (token: string, type: string) => {
 const generateResetPasswordToken = async (email) => {
   const user = await userService.getUserByEmail(email);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
+    return new ApiError(httpStatus.NOT_FOUND, "No users found with this email");
   }
   const expires = dayjs().add(config.jwt.resetExpirationMinutes, "minutes");
   const resetPasswordToken = generateToken(

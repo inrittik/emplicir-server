@@ -11,7 +11,7 @@ import {Types} from "mongoose"
 const getUserById = async (id: Types.ObjectId): Promise<typeof User> => {
   const user = await User.findById(id);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found against this id");
+    return new ApiError(httpStatus.NOT_FOUND, "User not found against this id");
   }
   return user;
 };
@@ -32,7 +32,7 @@ const getUserByEmail = async (email:string) => {
  */
 const createUser = async (userBody: any) => {
   if (await User.isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    return new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
   return User.create(userBody);
 };
@@ -46,10 +46,10 @@ const createUser = async (userBody: any) => {
 const updateUserById = async (userId:Types.ObjectId, updateBody:any) => {
   const user = await getUserById(userId);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    return new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
   if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    return new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
   }
   Object.assign(user, updateBody);
   await user.save();
